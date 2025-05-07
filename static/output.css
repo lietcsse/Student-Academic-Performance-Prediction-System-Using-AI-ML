@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+body {
+    background-color: #252424;
+    color: #0f0; /* Text color */
+    font-family: 'Quicksand', sans-serif;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%; /* Adjust as needed */
+    margin: 0 auto; /* Center the container horizontally */
+    padding: 20px; /* Add some padding */
+}
+
+.main-title {
+    text-align: center; /* Center the main title */
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #76ff03; /* Lighter green for the title */
+}
+
+.content1 {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #ffeb3b; /* Bright yellow for section headings */
+    text-align: left; /* Align headings to the left */
+}
+
+.graph-section, .tips-section {
+    width: 48%; /* Adjust width for responsiveness */
+}
+
+.Performance_Chart, .ideal-piechart {
+    width: 90%; /* Adjust width as needed */
+    margin: 0 auto; /* Center images */
+}
+
+.tips-section {
+    padding: 20px; /* Add some padding */
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    border-radius: 8px; /* Rounded corners */
+    text-align: left; /* Align content to the left */
+}
+
+.comparison-section {
+    text-align: left; /* Align content to the left */
+    margin: 30px 0;
+    padding: 20px; /* Add padding */
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.styled-button {
+    background-color: #76ff03; /* Button color */
+    color: #000; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.styled-button:hover {
+    background-color: #64dd17; /* Darker green on hover */
+}
+
+.graph-image {
+    display: block; /* Make the image a block element */
+    margin: 0 auto; /* Center the image horizontally */
+    max-width: 100%; /* Ensure the image doesn't exceed its container */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.error-message {
+    text-align: center; /* Center the error message */
+    color: #ff5722; /* Red for error messages */
+    font-size: 1.2em; /* Slightly larger font size for emphasis */
+}
+
+.tips-placeholder, .comparison-placeholder {
+    font-size: 17px; /* Adjust font size as needed */
+    line-height: 1.5; /* Adjust line height as needed */
+    color: #e0e0e0; /* Slightly lighter color for readability */
+}

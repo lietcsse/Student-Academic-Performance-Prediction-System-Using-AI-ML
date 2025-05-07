@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output Page - Performance Analytics</title>
+    <link rel="stylesheet" href="/static/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- Include jsPDF -->
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="main-title">Performance Analytics</h1>
+
+        <div class="content1">
+            <div class="graph-section">
+                {% if user_id %}
+                    <img src="{{ url_for('static', filename=user_id + '_performance_graph.png') }}" alt="Performance Graph" class="graph-image" id="performance-graph">
+                {% else %}
+                    <p class="error-message">No user ID provided.</p>
+                {% endif %}
+            </div>
+
+            <div class="tips-section">
+                <h2>Tips for Improvement</h2>
+                <div id="tips-placeholder" class="tips-placeholder">Loading tips...</div>
+            </div>
+        </div>
+
+        <h2>Performance Charts</h2>
+        <div class="charts-container content1">
+            <div class="Performance_Chart">
+                {% if user_id %}
+                    <img src="{{ url_for('static', filename=user_id + '_performance_piechart.png') }}" alt="Performance Pie Chart" class="graph-image" id="performance-piechart">
+                {% else %}
+                    <p class="error-message">No Pie charts available.</p>
+                {% endif %}
+            </div>
+            <div class="ideal-piechart">
+                <img src="{{ url_for('static', filename='Ideal_performance_piechart.png') }}" alt="Ideal Performance Pie Chart" class="graph-image" id="ideal-piechart">
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2>Performance Comparison</h2>
+            <div id="comparison-placeholder" class="comparison-placeholder">Loading comparison...</div>
+        </div>
+
+        <div class="actions">
+            <button id="download-pdf" class="styled-button">Download PDF Report</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuDxckSsWSJI3nsIpESKSfmdBNnRId0-w",
+            authDomain: "student-performance-de2c7.firebaseapp.com",
+            projectId: "student-performance-de2c7",
+            storageBucket: "student-performance-de2c7.firebasestorage.app",
+            messagingSenderId: "387224762479",
+            appId: "1:387224762479:web:723bc6d63e9373a83df59a",
+            measurementId: "G-QYYEDCDY7Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function fetchTips(user_id) {
+            try {
+                const userDocRef = doc(db, "users", user_id);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const tips = docSnap.data().tips;
+                    const tipsPlaceholder = document.getElementById("tips-placeholder");
+                    if (tips) {
+                        tipsPlaceholder.innerHTML = tips.split('\n').join('<br>');
+                    } else {
+                        tipsPlaceholder.textContent = "No tips available.";
+                    }
+                } else {
+                    console.log("User document not found.");
+                }
+            } catch (error) {
+                console.error("Error fetching tips:", error);
+            }
+        }
+
+        async function fetchComparison(user_id) {
+            try {
+                const userDocRef = doc(db, "users", user_id);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const comparison = docSnap.data().comparison;
+                    const comparisonPlaceholder = document.getElementById("comparison-placeholder");
+                    if (comparison) {
+                        comparisonPlaceholder.innerHTML = comparison.split('\n').join('<br>');
+                    } else {
+                        comparisonPlaceholder.textContent = "No comparison available.";
+                    }
+                } else {
+                    console.log("User document not found.");
+                }
+            } catch (error) {
+                console.error("Error fetching comparison:", error);
+            }
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            pdf.setFontSize(20);
+            pdf.text("Performance Analytics Report", 20, 20);
+
+            const images = [
+                { src: document.getElementById('performance-graph').src, y: 30 },
+                { src: document.getElementById('performance-piechart').src, y: 120 },
+                { src: document.getElementById('ideal-piechart').src, y: 210 },
+            ];
+
+            for (const image of images) {
+                // Ensure that the image is loaded before adding it to the PDF
+                const imgData = await fetch(image.src)
+                    .then(res => res.blob())
+                    .then(blob => new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }));
+
+                if (imgData) {
+                    pdf.addImage(imgData, 'PNG', 15, image.y, 180, 90);
+                }
+            }
+
+            // Add tips to the PDF
+            pdf.setFontSize(14);
+            pdf.text("Tips for Improvement:", 20, 300);
+            pdf.setFontSize(12);
+            const tipsText = document.getElementById("tips-placeholder").innerText;
+            const tipsLines = pdf.splitTextToSize(tipsText, 180);
+            pdf.text(tipsLines, 20, 310);
+
+            // Add comparison text to the PDF with left alignment
+            pdf.setFontSize(14);
+            pdf.text("Performance Comparison:", 20, 320 + (tipsLines.length * 10));
+            pdf.setFontSize(12);
+            const comparisonText = document.getElementById("comparison-placeholder").innerText;
+            const comparisonLines = pdf.splitTextToSize(comparisonText, 180);
+            pdf.text(comparisonLines, 20, 330 + (tipsLines.length * 10) + (comparisonLines.length * 10));
+
+            pdf.save("Performance_AnalyticsReport.pdf");
+        }
+
+        document.getElementById("download-pdf").addEventListener("click", downloadPDF);
+
+        const user_id = "{{ user_id }}"; // Get user_id from Flask
+        fetchTips(user_id);
+        fetchComparison(user_id);
+    </script>
+</body>
+
+</html>
